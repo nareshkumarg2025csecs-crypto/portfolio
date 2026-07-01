@@ -9,8 +9,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        cream: "#F3EEE1",
+        rust: "#C1502E",
+        darkbrown: "#2B2118",
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+        serif: ["var(--font-fraunces)", "serif"],
+        display: ["var(--font-montenegrin)", "serif"],
+      },
+      animation: {
+        "marquee": "marquee 25s linear infinite",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-100%)" },
+        },
       },
     },
   },
