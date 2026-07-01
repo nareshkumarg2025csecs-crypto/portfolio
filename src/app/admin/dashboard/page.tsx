@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { auth, db, storage } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { collection, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, addDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, addDoc, Timestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Link from "next/link";
 
@@ -17,12 +17,21 @@ interface Certification {
   imageUrl?: string;
 }
 
+interface Message {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: Timestamp;
+  read: boolean;
+}
+
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   
   const [activeTab, setActiveTab] = useState("messages");
-  const [messages, setMessages] = useState<Record<string, unknown>[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
 
   useEffect(() => {
@@ -37,7 +46,7 @@ export default function DashboardPage() {
     // Subscribe to messages
     const qMsgs = query(collection(db, "messages"), orderBy("createdAt", "desc"));
     const unsubMsgs = onSnapshot(qMsgs, (snapshot) => {
-      const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
       setMessages(msgs);
     });
 
