@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import ConditionalNavbar from "@/components/ConditionalNavbar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", style: ['normal', 'italic'] });
@@ -22,7 +23,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.variable} ${fraunces.variable} ${montenegrin.variable} selection:bg-rust selection:text-cream`}>
+      <body className={`${inter.variable} ${fraunces.variable} ${montenegrin.variable} selection:bg-rust selection:text-cream overflow-x-hidden`}>
+        <ConditionalNavbar />
         {children}
       </body>
     </html>

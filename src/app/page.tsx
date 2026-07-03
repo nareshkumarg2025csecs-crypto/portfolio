@@ -1,76 +1,51 @@
 import Image from "next/image";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import Ticker from "@/components/Ticker";
 import ClockWidget from "@/components/ClockWidget";
 import ProjectCard from "@/components/ProjectCard";
 import CertificationCard from "@/components/CertificationCard";
 import ContactForm from "@/components/ContactForm";
+import SplitText from "@/components/SplitText";
 
-// Pre-populated data based on instructions
-const skills = {
-  Languages: ["JavaScript", "Data Structures in C", "Python", "C++", "HTML/CSS"],
-  Frameworks: ["Next.js", "React", "React Native", "Expo", "Node.js"],
-  "Cybersecurity Tools": ["Wireshark", "Bettercap", "Brute Forcing", "Nmap", "Nikto"],
-  "Cloud/Firebase": ["Firestore", "Firebase Auth", "Firebase Storage", "Google Cloud", "Vercel"]
-};
+import { collection, getDocs, query, orderBy, getDoc, doc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-const projects = [
-  {
-    title: "ESG Report Verifier",
-    description: "A blockchain-integrated platform for validating ESG reports with tamper-resistant verification.",
-    tags: ["Blockchain", "Web App", "Verification"],
-    githubUrl: "https://github.com/nareshkumarg2025csecs-crypto/green-max-cord"
-  },
-  {
-    title: "TrackerCore",
-    description: "A predictive expense tracker that monitors spending patterns and delivers savings guidance.",
-    tags: ["React", "Firebase", "Analytics"],
-    githubUrl: "https://github.com/nareshkumarg2025csecs-crypto/trackercore"
-  },
-  {
-    title: "Royal Gym",
-    description: "A cross-platform mobile app managing gym member payments and overdue tracking.",
-    tags: ["React Native", "Expo", "Firebase"],
-    githubUrl: "https://github.com/nareshkumarg2025csecs-crypto/royalgym"
-  },
-  {
-    title: "Retaaspis",
-    description: "A hackathon project targeting marketplace fraud vectors and platform trust.",
-    tags: ["Cybersecurity", "Hackathon"],
-    githubUrl: "https://github.com/nareshkumarg2025csecs-crypto/Reta-Aspis"
-  },
-  {
-    title: "Buytopia",
-    description: "A full-featured e-commerce platform with cart and payment integration.",
-    tags: ["React", "Node.js", "MongoDB"],
-    githubUrl: "https://github.com/nareshkumarg2025csecs-crypto/Buytopia"
-  },
-  {
-    title: "FraudShield",
-    description: "A return-fraud detection platform with blockchain-based receipt verification.",
-    tags: ["Solidity", "Gemini Vision"],
-    githubUrl: "https://github.com/nareshkumarg2025csecs-crypto/Reta-Aspis"
+export const revalidate = 0; // Disable cache so data is always fresh
+
+async function getPortfolioData() {
+  try {
+    const profileSnap = await getDoc(doc(db, "profile", "main"));
+    const profile = profileSnap.exists() ? profileSnap.data() : null;
+
+    const skillsSnap = await getDocs(collection(db, "skills"));
+    const skillsData = skillsSnap.docs.map(d => d.data());
+    const skills: Record<string, string[]> = {};
+    skillsData.forEach(s => {
+      if (!skills[s.category]) skills[s.category] = [];
+      skills[s.category].push(s.name);
+    });
+
+    const projectsSnap = await getDocs(query(collection(db, "projects"), orderBy("order", "asc")));
+    const projects = projectsSnap.docs.map(d => d.data());
+
+    const certsSnap = await getDocs(collection(db, "certifications"));
+    const certifications = certsSnap.docs.map(d => d.data())
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return { profile, skills, projects, certifications };
+  } catch (error) {
+    console.error("Error fetching portfolio data:", error);
+    return { profile: null, skills: {}, projects: [], certifications: [] };
   }
-];
+}
 
-const certifications = [
-  { title: "Hack Hustle 2.0", issuer: "Saveetha Engineering College, Tech Society", date: "2026-04-29", imageUrl: "Hackathon_Retaaspis.jpeg" },
-  { title: "UI Whisper — 1st Place, XYPHER'26", issuer: "IEEE Computer Society, Rajalakshmi Engineering College", date: "2026-04-28", imageUrl: "UIUX_firstprice.jpeg" },
-  { title: "UI/UX Design Webinar", issuer: "Brand Monk Academy (NSDC)", date: "2026-04-24", imageUrl: "UIUX_bootcamp.jpeg" },
-  { title: "INNOBYTE — AI Student Hackathon", issuer: "SIMATS Engineering", date: "2026-02-26", imageUrl: "AI_hackathon.jpeg" },
-  { title: "DELTABUILD — Top 10 of 155 teams", issuer: "DELTA 2K26, Cognizance", date: "2026-01-01", imageUrl: "hackathon_ESG_website.jpeg" },
-  { title: "ELYNDRA 2025", issuer: "SIMATS Engineering", date: "2025-11-04", imageUrl: "Tech_quiz.jpeg" }
-].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-export default function Home() {
+export default async function Home() {
+  const { profile, skills, projects, certifications } = await getPortfolioData();
   return (
-    <main className="relative w-full min-h-screen text-darkbrown overflow-x-hidden selection:bg-rust selection:text-cream">
+    <main className="relative w-full min-h-screen text-darkbrown selection:bg-rust selection:text-cream">
       {/* Background Texture with Overlay */}
       <div className="fixed inset-0 z-[-2] bg-[url('/textures/bg-texture.jpg')] bg-repeat" style={{ backgroundSize: '300px' }}></div>
       <div className="fixed inset-0 z-[-1] bg-[#F3EEE1]/85"></div>
-      
-      <Navbar />
       
       {/* Home / Hero Section */}
       <section id="home" className="relative w-full h-screen flex flex-col justify-between pt-24 pb-12 px-6 sm:px-12 md:px-24 snap-start">
@@ -80,11 +55,22 @@ export default function Home() {
         
         <div className="w-full mt-32 flex flex-col items-center justify-center flex-grow text-center">
           <div className="animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
-            <h1 className="font-display text-5xl sm:text-7xl md:text-9xl tracking-tighter uppercase text-rust leading-none">
-              Nareshkumar G
-            </h1>
+            <SplitText
+              text={profile?.name || "Naresh Kumar G"}
+              className="font-display text-5xl sm:text-7xl md:text-9xl tracking-tighter uppercase text-rust leading-none"
+              delay={40}
+              duration={1}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+              tag="h1"
+            />
             <p className="mt-6 font-serif italic text-2xl sm:text-3xl md:text-4xl text-darkbrown/80 max-w-3xl mx-auto">
-              Full-Stack Developer & Cybersecurity Enthusiast
+              {profile?.title || "Full-Stack Developer & Cybersecurity Enthusiast"}
             </p>
           </div>
           
@@ -103,6 +89,15 @@ export default function Home() {
         <div className="absolute bottom-12 left-0 w-full animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
           <Ticker />
         </div>
+
+        <div className="absolute bottom-12 right-6 md:right-12 z-20 animate-bounce">
+          <span 
+            className="font-sans text-[10px] uppercase tracking-widest text-rust"
+            style={{ writingMode: 'vertical-rl' }}
+          >
+            Scroll to explore
+          </span>
+        </div>
       </section>
 
       {/* 01 About Section */}
@@ -116,8 +111,8 @@ export default function Home() {
           <div className="md:col-span-5 md:col-start-2">
             <div className="aspect-[3/4] relative w-full overflow-hidden bg-darkbrown/5 filter grayscale hover:grayscale-0 transition-all duration-700">
               <Image 
-                src="/images/profile.png" 
-                alt="Nareshkumar G" 
+                src={profile?.photoUrl || "/images/profile.png"} 
+                alt={profile?.name || "Profile"} 
                 fill 
                 className="object-cover"
                 style={{ objectPosition: "80% 30%" }}
@@ -127,7 +122,7 @@ export default function Home() {
           </div>
           <div className="md:col-span-5 flex flex-col gap-8">
             <h3 className="font-serif text-3xl md:text-4xl text-darkbrown leading-tight">
-              I build secure, scalable applications and explore the intersection of web development and cybersecurity.
+              {profile?.bio || "I build secure, scalable applications and explore the intersection of web development and cybersecurity."}
             </h3>
             <p className="font-sans text-darkbrown/80 leading-relaxed text-lg">
               Currently pursuing a B.E. in CSE (Cybersecurity) alongside an Honours Diploma in Full Stack Development at CSC. I&apos;m passionate about creating seamless digital experiences backed by robust, secure architectures.
@@ -254,7 +249,7 @@ export default function Home() {
             </div>
             
             <div className="mt-16 pt-8 border-t border-darkbrown/10">
-              <a href="/resume.pdf" download className="inline-flex items-center gap-4 bg-rust text-cream font-mono text-xs uppercase tracking-widest px-8 py-4 hover:bg-darkbrown transition-colors duration-300">
+              <a href={profile?.resumeUrl || "/resume.pdf"} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-4 bg-rust text-cream font-mono text-xs uppercase tracking-widest px-8 py-4 hover:bg-darkbrown transition-colors duration-300">
                 Download Resume
               </a>
             </div>
@@ -272,10 +267,10 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-2 text-center md:text-right">
             <p className="font-mono text-xs text-darkbrown/70">
-              Phone: 9840264843
+              Phone: {profile?.phone || "9840264843"}
             </p>
             <p className="font-mono text-xs text-darkbrown/70">
-              Email: nareshkumar.g.2025.csecs@rajalakshmi.edu.in
+              Email: {profile?.email || "nareshkumar.g.2025.csecs@rajalakshmi.edu.in"}
             </p>
             <p className="font-mono text-xs uppercase tracking-widest text-darkbrown/50">
               © {new Date().getFullYear()} Nareshkumar G
