@@ -248,11 +248,13 @@ export default async function Home() {
               </div>
             </div>
             
-            <div className="mt-16 pt-8 border-t border-darkbrown/10">
-              <a href={profile?.resumeUrl || "/resume.pdf"} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-4 bg-rust text-cream font-mono text-xs uppercase tracking-widest px-8 py-4 hover:bg-darkbrown transition-colors duration-300">
-                Download Resume
-              </a>
-            </div>
+            {profile?.resumeUrl && (
+              <div className="mt-16 pt-8 border-t border-darkbrown/10">
+                <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-4 bg-rust text-cream font-mono text-xs uppercase tracking-widest px-8 py-4 hover:bg-darkbrown transition-colors duration-300">
+                  Download Resume
+                </a>
+              </div>
+            )}
           </div>
           
           <div className="bg-cream border border-darkbrown/10 p-8 sm:p-12 h-max">

@@ -71,6 +71,7 @@ export default function DashboardPage() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editingCertification, setEditingCertification] = useState<Certification | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -135,6 +136,36 @@ export default function DashboardPage() {
   const deleteMessage = async (id: string) => {
     if (confirm("Are you sure?")) {
       await deleteDoc(doc(db, "messages", id));
+    }
+  };
+
+  const handleRemoveProfilePhoto = async () => {
+    if (!profile?.photoUrl) return;
+    if (confirm("Remove profile photo?")) {
+      await setDoc(doc(db, "profile", "main"), { photoUrl: "" }, { merge: true });
+    }
+  };
+
+  const handleRemoveResume = async () => {
+    if (!profile?.resumeUrl) return;
+    if (confirm("Remove resume?")) {
+      await setDoc(doc(db, "profile", "main"), { resumeUrl: "" }, { merge: true });
+    }
+  };
+
+  const handleRemoveProjectImage = async () => {
+    if (!editingProject?.imageUrl) return;
+    if (confirm("Remove project image?")) {
+      await updateDoc(doc(db, "projects", editingProject.id), { imageUrl: "" });
+      setEditingProject({ ...editingProject, imageUrl: "" });
+    }
+  };
+
+  const handleRemoveCertificationImage = async () => {
+    if (!editingCertification?.imageUrl) return;
+    if (confirm("Remove certification image?")) {
+      await updateDoc(doc(db, "certifications", editingCertification.id), { imageUrl: "" });
+      setEditingCertification({ ...editingCertification, imageUrl: "" });
     }
   };
 
@@ -257,6 +288,42 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCertificationSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const file = formData.get("image") as File;
+    let imageUrl = editingCertification?.imageUrl || "";
+
+    try {
+      if (file && file.size > 0) {
+        const filePath = `certifications/${Date.now()}_${file.name}`;
+        const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
+        imageUrl = publicUrl;
+      }
+
+      const certData = {
+        title: formData.get("title"),
+        issuer: formData.get("issuer"),
+        date: formData.get("date"),
+        imageUrl
+      };
+
+      if (editingCertification) {
+        await updateDoc(doc(db, "certifications", editingCertification.id), certData);
+        setEditingCertification(null);
+      } else {
+        await addDoc(collection(db, "certifications"), certData);
+      }
+      (e.target as HTMLFormElement).reset();
+      alert("Certification saved!");
+    } catch (err) {
+      console.error("Error saving certification:", err);
+      alert("Failed to save certification.");
+    }
+  };
+
   if (loading || !user) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
@@ -264,11 +331,11 @@ export default function DashboardPage() {
       <aside className="w-full md:w-64 bg-darkbrown/5 border-r border-darkbrown/10 flex flex-col p-6">
         <h2 className="font-serif text-2xl text-rust mb-8">Dashboard</h2>
         <nav className="flex flex-col gap-2 flex-grow">
-          {["Profile", "Skills", "Projects", "Certifications", "Messages", "Resume"].map(tab => (
+          {["Profile", "Skills", "Projects", "Certifications", "Messages"].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab.toLowerCase())}
-              className={`text-left font-mono text-xs uppercase tracking-widest p-3 transition-colors ${activeTab === tab.toLowerCase() || (activeTab === 'profile' && tab === 'Resume') ? 'bg-rust text-cream' : 'text-darkbrown/70 hover:bg-darkbrown/10'}`}
+              className={`text-left font-mono text-xs uppercase tracking-widest p-3 transition-colors ${activeTab === tab.toLowerCase() ? 'bg-rust text-cream' : 'text-darkbrown/70 hover:bg-darkbrown/10'}`}
             >
               {tab}
             </button>
@@ -285,9 +352,9 @@ export default function DashboardPage() {
       </aside>
 
       <main className="flex-grow p-6 md:p-12 overflow-y-auto max-h-screen bg-[#F3EEE1]">
-        <h1 className="font-serif text-4xl text-rust mb-8 capitalize">{activeTab === 'resume' ? 'Profile' : activeTab}</h1>
+        <h1 className="font-serif text-4xl text-rust mb-8 capitalize">{activeTab}</h1>
         
-        {(activeTab === "profile" || activeTab === "resume") && (
+        {activeTab === "profile" && (
           <div className="flex flex-col gap-8">
             <form onSubmit={handleProfileSubmit} className="bg-white/50 border border-darkbrown/10 p-6 flex flex-col gap-6 shadow-sm">
               <h2 className="font-serif text-2xl text-darkbrown">Edit Profile & Resume</h2>
@@ -329,14 +396,26 @@ export default function DashboardPage() {
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Profile Photo (Upload new to replace)</label>
                   <input type="file" name="photo" accept="image/*" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
                   {profile?.photoUrl && (
-                    <p className="text-xs text-darkbrown/50 mt-1">Current: {profile.photoUrl.split('/').pop()?.split('?')[0]}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-12 h-12 rounded-full overflow-hidden relative group">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                        <button type="button" onClick={handleRemoveProfilePhoto} className="absolute top-0 right-0 bg-darkbrown/80 text-cream w-4 h-4 rounded-full flex items-center justify-center text-[10px] hover:bg-rust transition-colors leading-none pb-[1px]" aria-label="Remove photo">&times;</button>
+                      </div>
+                      <p className="text-xs text-darkbrown/50 line-clamp-1">{profile.photoUrl.split('/').pop()?.split('?')[0]}</p>
+                    </div>
                   )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Resume PDF (Upload new to replace)</label>
                   <input type="file" name="resume" accept="application/pdf" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
                   {profile?.resumeUrl && (
-                    <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-rust hover:underline mt-1">View Current Resume</a>
+                    <div className="flex items-center gap-4 mt-1">
+                      <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-rust hover:underline">View Current Resume</a>
+                      <button type="button" onClick={handleRemoveResume} className="text-xs font-mono uppercase text-darkbrown/60 hover:text-rust transition-colors flex items-center gap-1">
+                        <span className="text-[14px] leading-none pb-[1px]">&times;</span> Remove
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -412,6 +491,13 @@ export default function DashboardPage() {
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Project Image (Leave blank to keep existing)</label>
                   <input type="file" name="image" accept="image/*" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  {editingProject?.imageUrl && (
+                    <div className="relative w-32 h-24 mt-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={editingProject.imageUrl} alt="Project preview" className="w-full h-full object-cover rounded-sm" />
+                      <button type="button" onClick={handleRemoveProjectImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex items-center gap-4">
@@ -514,51 +600,34 @@ export default function DashboardPage() {
         
         {activeTab === "certifications" && (
           <div className="flex flex-col gap-8">
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const file = formData.get("image") as File;
-              let imageUrl = "";
-
-              console.log("Auth current user before certification save:", auth.currentUser);
-
-              try {
-                if (file && file.size > 0) {
-                  console.log("Uploading file to Supabase Storage...");
-                  const filePath = `certifications/${Date.now()}_${file.name}`;
-                  const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
-                  if (error) throw error;
-                  const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
-                  imageUrl = publicUrl;
-                  console.log("File uploaded successfully, URL:", imageUrl);
-                }
-
-                const newDoc = {
-                  title: formData.get("title"),
-                  issuer: formData.get("issuer"),
-                  date: formData.get("date"),
-                  imageUrl: imageUrl
-                };
-                console.log("Saving certification to Firestore:", newDoc);
-                const docRef = await addDoc(collection(db, "certifications"), newDoc);
-                console.log("Certification added with ID:", docRef.id);
-                (e.target as HTMLFormElement).reset();
-                alert("Certification added!");
-              } catch (err) {
-                console.error("Error adding doc:", err);
-                alert("Failed to add certification.");
-              }
-            }} className="bg-white/50 border border-darkbrown/10 p-6 flex flex-col gap-4 shadow-sm">
-              <h2 className="font-serif text-2xl text-darkbrown">Add Certification</h2>
+            <form onSubmit={handleCertificationSubmit} className="bg-white/50 border border-darkbrown/10 p-6 flex flex-col gap-4 shadow-sm">
+              <h2 className="font-serif text-2xl text-darkbrown">{editingCertification ? "Edit Certification" : "Add Certification"}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input name="title" required placeholder="Title" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <input name="issuer" required placeholder="Issuer" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <input name="date" required placeholder="Date (e.g., 2026-04-24)" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <input type="file" name="image" accept="image/*" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                <input name="title" required placeholder="Title" defaultValue={editingCertification?.title} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                <input name="issuer" required placeholder="Issuer" defaultValue={editingCertification?.issuer} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                <input name="date" required placeholder="Date (e.g., 2026-04-24)" defaultValue={editingCertification?.date} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                <div className="flex flex-col gap-2">
+                  <label className="font-mono text-xs uppercase text-darkbrown/60">Certificate Image (Leave blank to keep existing)</label>
+                  <input type="file" name="image" accept="image/*" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  {editingCertification?.imageUrl && (
+                    <div className="relative w-32 h-24 mt-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={editingCertification.imageUrl} alt="Certificate preview" className="w-full h-full object-cover rounded-sm" />
+                      <button type="button" onClick={handleRemoveCertificationImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
+                    </div>
+                  )}
+                </div>
               </div>
-              <button type="submit" className="self-start mt-4 bg-rust text-cream font-mono text-xs uppercase tracking-widest px-6 py-3 hover:bg-darkbrown transition-colors">
-                Save Certification
-              </button>
+              <div className="flex gap-4 mt-4">
+                <button type="submit" className="bg-rust text-cream font-mono text-xs uppercase tracking-widest px-6 py-3 hover:bg-darkbrown transition-colors">
+                  {editingCertification ? "Update Certification" : "Add Certification"}
+                </button>
+                {editingCertification && (
+                  <button type="button" onClick={() => setEditingCertification(null)} className="font-mono text-xs uppercase tracking-widest px-6 py-3 text-darkbrown hover:text-rust transition-colors">
+                    Cancel
+                  </button>
+                )}
+              </div>
             </form>
 
             <div className="flex flex-col gap-4 mt-8">
@@ -570,9 +639,12 @@ export default function DashboardPage() {
                     <p className="text-sm text-darkbrown/70">{cert.issuer} — {cert.date}</p>
                     {cert.imageUrl && <a href={cert.imageUrl.startsWith('http') ? cert.imageUrl : `/images/${cert.imageUrl}`} target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-rust hover:underline mt-1 inline-block">View Image</a>}
                   </div>
-                  <button onClick={async () => {
-                    if (confirm("Delete this certification?")) await deleteDoc(doc(db, "certifications", cert.id));
-                  }} className="text-xs font-mono uppercase tracking-widest text-rust hover:text-darkbrown transition-colors">Delete</button>
+                  <div className="flex gap-4">
+                    <button onClick={() => setEditingCertification(cert)} className="text-xs font-mono uppercase tracking-widest text-darkbrown hover:text-rust transition-colors">Edit</button>
+                    <button onClick={async () => {
+                      if (confirm("Delete this certification?")) await deleteDoc(doc(db, "certifications", cert.id));
+                    }} className="text-xs font-mono uppercase tracking-widest text-rust hover:text-darkbrown transition-colors">Delete</button>
+                  </div>
                 </div>
               ))}
             </div>
