@@ -23,7 +23,7 @@ export default function CertificationCard({ index, title, issuer, date, imageUrl
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="group relative border border-darkbrown/20 bg-cream p-6 flex flex-col gap-4 hover:bg-darkbrown/5 transition-colors duration-500 cursor-pointer"
+        className="group relative border border-darkbrown/20 bg-cream p-6 flex flex-col gap-4 shadow-md hover:shadow-xl hover:border-rust transition-all duration-500 cursor-pointer"
         onClick={() => imageUrl && setIsModalOpen(true)}
       >
         <div className="flex justify-between items-start relative z-10">

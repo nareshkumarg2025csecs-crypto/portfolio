@@ -21,7 +21,7 @@ export default function ProjectCard({ index, title, description, tags, githubUrl
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="group relative border border-darkbrown/20 bg-cream p-6 sm:p-8 flex flex-col gap-6 hover:border-rust transition-colors duration-500"
+      className="group relative border border-darkbrown/20 bg-cream p-6 sm:p-8 flex flex-col gap-6 shadow-md hover:shadow-xl hover:border-rust transition-all duration-500"
     >
       <div className="flex justify-between items-start">
         <span className="font-mono text-xs uppercase tracking-widest text-darkbrown/60">

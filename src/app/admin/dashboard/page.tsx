@@ -58,11 +58,23 @@ interface Project {
   order: number;
 }
 
+const classes = {
+  card: "bg-white/80 border border-[rgba(58,46,38,0.08)] rounded-[14px] shadow-[0_1px_3px_rgba(58,46,38,0.06),0_1px_2px_rgba(58,46,38,0.04)] hover:shadow-[0_4px_12px_rgba(58,46,38,0.08)] hover:-translate-y-[1px] transition-all duration-150 ease-out",
+  buttonPrimary: "bg-rust text-cream font-mono text-xs uppercase tracking-widest px-6 py-3 rounded-[10px] hover:bg-[#9d3f09] hover:-translate-y-[1px] transition-all duration-150 ease-out disabled:opacity-50",
+  buttonSecondary: "font-mono text-xs uppercase tracking-widest rounded-lg px-2.5 py-1 bg-darkbrown/5 text-rust hover:bg-darkbrown/10 transition-colors duration-150",
+  buttonDelete: "font-mono text-xs uppercase tracking-widest rounded-lg px-2.5 py-1 bg-[#8c2a2a]/10 text-[#8c2a2a] hover:bg-[#8c2a2a]/20 transition-colors duration-150",
+  input: "w-full border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150",
+  badge: "font-mono text-[10px] uppercase tracking-widest text-rust bg-rust/10 px-2 py-0.5 rounded-md",
+  sidebarLinkActive: "text-left font-mono text-xs uppercase tracking-widest p-3 mx-2 rounded-[10px] bg-rust text-cream transition-all duration-150",
+  sidebarLinkInactive: "text-left font-mono text-xs uppercase tracking-widest p-3 mx-2 rounded-[10px] text-darkbrown/70 hover:bg-[#EAE4D3] transition-all duration-150",
+};
+
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   
   const [activeTab, setActiveTab] = useState("profile");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -327,21 +339,52 @@ export default function DashboardPage() {
   if (loading || !user) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      <aside className="w-full md:w-64 bg-darkbrown/5 border-r border-darkbrown/10 flex flex-col p-6">
-        <h2 className="font-serif text-2xl text-rust mb-8">Dashboard</h2>
-        <nav className="flex flex-col gap-2 flex-grow">
+    <div className="min-h-screen flex flex-col md:flex-row relative">
+      {/* Mobile hamburger button */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-darkbrown/10 hover:bg-darkbrown/20 text-darkbrown p-2 rounded-lg transition-colors"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Toggle menu"
+      >
+        {sidebarOpen ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        )}
+      </button>
+
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-darkbrown/30 backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed md:static inset-y-0 left-0 z-40
+        w-64 bg-[#EAE4D3] border-r border-darkbrown/10 flex flex-col
+        transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <h2 className="font-serif text-2xl text-rust mb-8 pt-6 pl-5">Dashboard</h2>
+        <nav className="flex flex-col gap-1 flex-grow px-2">
           {["Profile", "Skills", "Projects", "Certifications", "Messages"].map(tab => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab.toLowerCase())}
-              className={`text-left font-mono text-xs uppercase tracking-widest p-3 transition-colors ${activeTab === tab.toLowerCase() ? 'bg-rust text-cream' : 'text-darkbrown/70 hover:bg-darkbrown/10'}`}
+              onClick={() => { setActiveTab(tab.toLowerCase()); setSidebarOpen(false); }}
+              className={activeTab === tab.toLowerCase() ? classes.sidebarLinkActive : classes.sidebarLinkInactive}
             >
               {tab}
             </button>
           ))}
         </nav>
-        <div className="mt-8 pt-6 border-t border-darkbrown/10 flex flex-col gap-4">
+        <div className="mt-8 pt-6 border-t border-darkbrown/10 flex flex-col gap-4 px-5 pb-6">
           <Link href="/" className="font-mono text-xs uppercase tracking-widest text-darkbrown/60 hover:text-rust transition-colors">
             ← Back to Site
           </Link>
@@ -351,50 +394,50 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      <main className="flex-grow p-6 md:p-12 overflow-y-auto max-h-screen bg-[#F3EEE1]">
-        <h1 className="font-serif text-4xl text-rust mb-8 capitalize">{activeTab}</h1>
+      <main className="flex-grow p-4 md:p-8 overflow-y-auto min-h-screen bg-[#F3EEE1]">
+        <h1 className="font-serif text-[clamp(1.5rem,5vw,2.5rem)] text-rust mt-6 ml-10 md:ml-6 mb-5 capitalize">{activeTab}</h1>
         
         {activeTab === "profile" && (
           <div className="flex flex-col gap-8">
-            <form onSubmit={handleProfileSubmit} className="bg-white/50 border border-darkbrown/10 p-6 flex flex-col gap-6 shadow-sm">
-              <h2 className="font-serif text-2xl text-darkbrown">Edit Profile & Resume</h2>
+            <form onSubmit={handleProfileSubmit} className={`${classes.card} p-4 sm:p-6 flex flex-col gap-5`}>
+              <h2 className="font-serif text-2xl text-darkbrown mt-2 mb-4">Edit Profile &amp; Resume</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Name</label>
-                  <input name="name" defaultValue={profile?.name} required className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input name="name" defaultValue={profile?.name} required className={classes.input} />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Title</label>
-                  <input name="title" defaultValue={profile?.title} required className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input name="title" defaultValue={profile?.title} required className={classes.input} />
                 </div>
-                <div className="flex flex-col gap-2 md:col-span-2">
+                <div className="flex flex-col gap-2 sm:col-span-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Bio</label>
-                  <textarea name="bio" defaultValue={profile?.bio} required rows={4} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust resize-none" />
+                  <textarea name="bio" defaultValue={profile?.bio} required rows={4} className={`${classes.input} resize-none`} />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Location</label>
-                  <input name="location" defaultValue={profile?.location} required className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input name="location" defaultValue={profile?.location} required className={classes.input} />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Email</label>
-                  <input name="email" type="email" defaultValue={profile?.email} required className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input name="email" type="email" defaultValue={profile?.email} required className={classes.input} />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Phone</label>
-                  <input name="phone" defaultValue={profile?.phone} required className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input name="phone" defaultValue={profile?.phone} required className={classes.input} />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">GitHub URL</label>
-                  <input name="githubUrl" defaultValue={profile?.githubUrl} required className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input name="githubUrl" defaultValue={profile?.githubUrl} required className={classes.input} />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">LinkedIn URL</label>
-                  <input name="linkedinUrl" defaultValue={profile?.linkedinUrl} required className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input name="linkedinUrl" defaultValue={profile?.linkedinUrl} required className={classes.input} />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Profile Photo (Upload new to replace)</label>
-                  <input type="file" name="photo" accept="image/*" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input type="file" name="photo" accept="image/*" className="border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-rust/10 file:text-rust hover:file:bg-rust/20" />
                   {profile?.photoUrl && (
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-12 h-12 rounded-full overflow-hidden relative group">
@@ -408,11 +451,11 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Resume PDF (Upload new to replace)</label>
-                  <input type="file" name="resume" accept="application/pdf" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input type="file" name="resume" accept="application/pdf" className="border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-rust/10 file:text-rust hover:file:bg-rust/20" />
                   {profile?.resumeUrl && (
                     <div className="flex items-center gap-4 mt-1">
-                      <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-rust hover:underline">View Current Resume</a>
-                      <button type="button" onClick={handleRemoveResume} className="text-xs font-mono uppercase text-darkbrown/60 hover:text-rust transition-colors flex items-center gap-1">
+                      <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className={classes.buttonSecondary}>View Current Resume</a>
+                      <button type="button" onClick={handleRemoveResume} className={`${classes.buttonSecondary} flex items-center gap-1`}>
                         <span className="text-[14px] leading-none pb-[1px]">&times;</span> Remove
                       </button>
                     </div>
@@ -420,7 +463,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               
-              <button type="submit" disabled={isSavingProfile} className="self-start mt-4 bg-rust text-cream font-mono text-xs uppercase tracking-widest px-6 py-3 hover:bg-darkbrown transition-colors disabled:opacity-50">
+              <button type="submit" disabled={isSavingProfile} className={`w-full sm:w-auto sm:self-start mt-2 ${classes.buttonPrimary}`}>
                 {isSavingProfile ? "Saving..." : "Save Profile & Resume"}
               </button>
             </form>
@@ -429,22 +472,22 @@ export default function DashboardPage() {
 
         {activeTab === "skills" && (
           <div className="flex flex-col gap-8">
-            <form onSubmit={handleSkillSubmit} className="bg-white/50 border border-darkbrown/10 p-6 flex flex-col gap-4 shadow-sm">
-              <h2 className="font-serif text-2xl text-darkbrown">{editingSkill ? "Edit Skill" : "Add Skill"}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input name="name" required placeholder="Skill Name" defaultValue={editingSkill?.name} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <input name="category" required placeholder="Category (e.g. Frontend, Tools, Cloud…)" defaultValue={editingSkill?.category || ""} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+            <form onSubmit={handleSkillSubmit} className={`${classes.card} p-4 sm:p-6 flex flex-col gap-4`}>
+              <h2 className="font-serif text-2xl text-darkbrown mt-2 mb-4">{editingSkill ? "Edit Skill" : "Add Skill"}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <input name="name" required placeholder="Skill Name" defaultValue={editingSkill?.name} className={classes.input} />
+                <input name="category" required placeholder="Category (e.g. Frontend, Tools, Cloud…)" defaultValue={editingSkill?.category || ""} className={classes.input} />
                 <div className="flex flex-col justify-center">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Proficiency (1-100)</label>
                   <input type="range" name="proficiency" min="1" max="100" defaultValue={editingSkill?.proficiency || 50} className="w-full accent-rust" />
                 </div>
               </div>
-              <div className="flex gap-4 mt-4">
-                <button type="submit" className="bg-rust text-cream font-mono text-xs uppercase tracking-widest px-6 py-3 hover:bg-darkbrown transition-colors">
+              <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                <button type="submit" className={`w-full sm:w-auto ${classes.buttonPrimary}`}>
                   {editingSkill ? "Update Skill" : "Add Skill"}
                 </button>
                 {editingSkill && (
-                  <button type="button" onClick={() => setEditingSkill(null)} className="font-mono text-xs uppercase tracking-widest px-6 py-3 text-darkbrown hover:text-rust transition-colors">
+                  <button type="button" onClick={() => setEditingSkill(null)} className={`w-full sm:w-auto ${classes.buttonSecondary}`}>
                     Cancel
                   </button>
                 )}
@@ -452,20 +495,20 @@ export default function DashboardPage() {
             </form>
 
             <div className="flex flex-col gap-4 mt-8">
-              <h2 className="font-serif text-2xl text-darkbrown">Existing Skills</h2>
+              <h2 className="font-serif text-2xl text-darkbrown mt-2 mb-4">Existing Skills</h2>
               {skills.length === 0 ? <p className="text-darkbrown/60">No skills found.</p> : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {skills.map(skill => (
-                    <div key={skill.id} className="p-4 border border-darkbrown/10 bg-white shadow-sm flex justify-between items-center">
-                      <div>
-                        <h3 className="font-sans font-medium text-lg">{skill.name}</h3>
+                    <div key={skill.id} className={`${classes.card} p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3`}>
+                      <div className="min-w-0">
+                        <h3 className="font-sans font-medium text-lg truncate">{skill.name}</h3>
                         <p className="text-sm text-darkbrown/70">{skill.category} — {skill.proficiency}%</p>
                       </div>
-                      <div className="flex gap-4">
-                        <button onClick={() => setEditingSkill(skill)} className="text-xs font-mono uppercase tracking-widest text-darkbrown hover:text-rust transition-colors">Edit</button>
+                      <div className="flex flex-wrap gap-2 items-center shrink-0">
+                        <button onClick={() => setEditingSkill(skill)} className={classes.buttonSecondary}>Edit</button>
                         <button onClick={async () => {
                           if (confirm("Delete this skill?")) await deleteDoc(doc(db, "skills", skill.id));
-                        }} className="text-xs font-mono uppercase tracking-widest text-rust hover:text-darkbrown transition-colors">Delete</button>
+                        }} className={classes.buttonDelete}>Delete</button>
                       </div>
                     </div>
                   ))}
@@ -477,46 +520,46 @@ export default function DashboardPage() {
 
         {activeTab === "projects" && (
           <div className="flex flex-col gap-8">
-            <form onSubmit={handleProjectSubmit} className="bg-white/50 border border-darkbrown/10 p-6 flex flex-col gap-4 shadow-sm">
-              <h2 className="font-serif text-2xl text-darkbrown">{editingProject ? "Edit Project" : "Add Project"}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input name="title" required placeholder="Project Title" defaultValue={editingProject?.title} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <input name="tags" required placeholder="Tags (comma separated)" defaultValue={editingProject?.tags.join(", ")} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <div className="md:col-span-2">
-                  <textarea name="description" required placeholder="Project Description" defaultValue={editingProject?.description} rows={3} className="w-full border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust resize-none" />
+            <form onSubmit={handleProjectSubmit} className={`${classes.card} p-4 sm:p-6 flex flex-col gap-4`}>
+              <h2 className="font-serif text-2xl text-darkbrown mt-2 mb-4">{editingProject ? "Edit Project" : "Add Project"}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input name="title" required placeholder="Project Title" defaultValue={editingProject?.title} className={classes.input} />
+                <input name="tags" required placeholder="Tags (comma separated)" defaultValue={editingProject?.tags.join(", ")} className={classes.input} />
+                <div className="sm:col-span-2">
+                  <textarea name="description" required placeholder="Project Description" defaultValue={editingProject?.description} rows={3} className={`${classes.input} resize-none`} />
                 </div>
-                <input name="githubUrl" type="url" placeholder="GitHub URL" defaultValue={editingProject?.githubUrl} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <input name="liveUrl" type="url" placeholder="Live URL" defaultValue={editingProject?.liveUrl} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                <input name="githubUrl" type="url" placeholder="GitHub URL" defaultValue={editingProject?.githubUrl} className={classes.input} />
+                <input name="liveUrl" type="url" placeholder="Live URL" defaultValue={editingProject?.liveUrl} className={classes.input} />
                 
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Project Image (Leave blank to keep existing)</label>
-                  <input type="file" name="image" accept="image/*" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input type="file" name="image" accept="image/*" className="border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-rust/10 file:text-rust hover:file:bg-rust/20" />
                   {editingProject?.imageUrl && (
                     <div className="relative w-32 h-24 mt-2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={editingProject.imageUrl} alt="Project preview" className="w-full h-full object-cover rounded-sm" />
+                      <img src={editingProject.imageUrl} alt="Project preview" className="w-full h-full object-cover rounded-[6px]" />
                       <button type="button" onClick={handleRemoveProjectImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
                     </div>
                   )}
                 </div>
                 
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" name="featured" defaultChecked={editingProject?.featured} className="accent-rust w-4 h-4" />
                     <span className="font-mono text-xs uppercase text-darkbrown/80">Featured</span>
                   </label>
                   <div className="flex items-center gap-2">
                     <label className="font-mono text-xs uppercase text-darkbrown/80">Order:</label>
-                    <input type="number" name="order" defaultValue={editingProject?.order || 0} className="w-16 border-b border-darkbrown/20 bg-transparent text-center focus:outline-none focus:border-rust" />
+                    <input type="number" name="order" defaultValue={editingProject?.order || 0} className={`${classes.input} w-24 text-center px-2 py-1`} />
                   </div>
                 </div>
               </div>
-              <div className="flex gap-4 mt-4">
-                <button type="submit" className="bg-rust text-cream font-mono text-xs uppercase tracking-widest px-6 py-3 hover:bg-darkbrown transition-colors">
+              <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                <button type="submit" className={`w-full sm:w-auto ${classes.buttonPrimary}`}>
                   {editingProject ? "Update Project" : "Add Project"}
                 </button>
                 {editingProject && (
-                  <button type="button" onClick={() => setEditingProject(null)} className="font-mono text-xs uppercase tracking-widest px-6 py-3 text-darkbrown hover:text-rust transition-colors">
+                  <button type="button" onClick={() => setEditingProject(null)} className={`w-full sm:w-auto ${classes.buttonSecondary}`}>
                     Cancel
                   </button>
                 )}
@@ -524,33 +567,33 @@ export default function DashboardPage() {
             </form>
 
             <div className="flex flex-col gap-4 mt-8">
-              <h2 className="font-serif text-2xl text-darkbrown">Existing Projects</h2>
+              <h2 className="font-serif text-2xl text-darkbrown mt-2 mb-4">Existing Projects</h2>
               {projects.length === 0 ? <p className="text-darkbrown/60">No projects found.</p> : (
                 <div className="grid grid-cols-1 gap-4">
                   {projects.map(proj => (
-                    <div key={proj.id} className="p-4 border border-darkbrown/10 bg-white shadow-sm flex flex-col md:flex-row gap-4 items-center">
+                    <div key={proj.id} className={`${classes.card} p-4 sm:p-5 flex flex-col sm:flex-row gap-4 items-start`}>
                       {proj.imageUrl && (
-                        <div className="w-full md:w-32 h-24 bg-darkbrown/5 flex-shrink-0 relative overflow-hidden">
+                        <div className="w-full sm:w-28 h-24 bg-darkbrown/5 flex-shrink-0 relative overflow-hidden rounded-[8px]">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover" />
                         </div>
                       )}
-                      <div className="flex-grow w-full">
-                        <div className="flex justify-between">
-                          <h3 className="font-sans font-medium text-lg flex items-center gap-2">
+                      <div className="flex-grow w-full min-w-0">
+                        <div className="flex justify-between gap-2">
+                          <h3 className="font-sans font-medium text-lg flex items-center gap-2 flex-wrap">
                             {proj.title}
-                            {proj.featured && <span className="bg-rust/10 text-rust text-[10px] uppercase px-2 py-0.5 rounded">Featured</span>}
+                            {proj.featured && <span className={classes.badge}>Featured</span>}
                           </h3>
-                          <span className="font-mono text-xs text-darkbrown/50">Order: {proj.order}</span>
+                          <span className="font-mono text-xs text-darkbrown/50 shrink-0">Order: {proj.order}</span>
                         </div>
                         <p className="text-sm text-darkbrown/70 line-clamp-2 mt-1">{proj.description}</p>
-                        <p className="text-xs font-mono text-darkbrown/50 mt-2">Tags: {proj.tags.join(", ")}</p>
+                        <p className="text-xs font-mono text-darkbrown/50 mt-2 truncate">Tags: {proj.tags.join(", ")}</p>
                       </div>
-                      <div className="flex md:flex-col gap-4 w-full md:w-auto justify-end">
-                        <button onClick={() => setEditingProject(proj)} className="text-xs font-mono uppercase tracking-widest text-darkbrown hover:text-rust transition-colors">Edit</button>
+                      <div className="flex flex-wrap sm:flex-col gap-2 shrink-0 sm:items-end mt-1 sm:mt-0">
+                        <button onClick={() => setEditingProject(proj)} className={classes.buttonSecondary}>Edit</button>
                         <button onClick={async () => {
                           if (confirm("Delete this project?")) await deleteDoc(doc(db, "projects", proj.id));
-                        }} className="text-xs font-mono uppercase tracking-widest text-rust hover:text-darkbrown transition-colors">Delete</button>
+                        }} className={classes.buttonDelete}>Delete</button>
                       </div>
                     </div>
                   ))}
@@ -566,28 +609,28 @@ export default function DashboardPage() {
               <p className="font-sans text-darkbrown/60">No messages yet.</p>
             ) : (
               messages.map(msg => (
-                <div key={msg.id} className={`p-6 border ${msg.read ? 'border-darkbrown/10 bg-white/30' : 'border-rust bg-white'} shadow-sm`}>
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-sans font-medium text-lg text-darkbrown">{msg.name}</h3>
-                      <a href={`mailto:${msg.email}`} className="font-mono text-xs text-rust hover:underline">{msg.email}</a>
+                <div key={msg.id} className={`${classes.card} p-5 sm:p-6 flex flex-col ${msg.read ? 'opacity-75' : 'border-rust'}`}>
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="min-w-0">
+                      <h3 className="font-sans font-medium text-lg text-darkbrown truncate">{msg.name}</h3>
+                      <a href={`mailto:${msg.email}`} className="font-mono text-xs text-rust hover:underline block mt-1 truncate">{msg.email}</a>
                     </div>
-                    <span className="font-mono text-[10px] uppercase text-darkbrown/40">
+                    <span className="font-mono text-[10px] uppercase text-darkbrown/40 shrink-0 pt-1">
                       {msg.createdAt?.toDate().toLocaleDateString()}
                     </span>
                   </div>
-                  <p className="font-sans text-darkbrown/80 whitespace-pre-wrap">{msg.message}</p>
+                  <p className="font-sans text-darkbrown/80 whitespace-pre-wrap mt-3">{msg.message}</p>
                   
-                  <div className="mt-6 flex gap-4 pt-4 border-t border-darkbrown/10">
+                  <div className="mt-4 flex flex-wrap gap-2 pt-4 border-t border-darkbrown/10">
                     <button 
                       onClick={() => markAsRead(msg.id, msg.read)}
-                      className="font-mono text-xs uppercase tracking-widest text-darkbrown/60 hover:text-rust"
+                      className={classes.buttonSecondary}
                     >
                       {msg.read ? "Mark Unread" : "Mark Read"}
                     </button>
                     <button 
                       onClick={() => deleteMessage(msg.id)}
-                      className="font-mono text-xs uppercase tracking-widest text-rust/70 hover:text-rust"
+                      className={classes.buttonDelete}
                     >
                       Delete
                     </button>
@@ -600,30 +643,30 @@ export default function DashboardPage() {
         
         {activeTab === "certifications" && (
           <div className="flex flex-col gap-8">
-            <form onSubmit={handleCertificationSubmit} className="bg-white/50 border border-darkbrown/10 p-6 flex flex-col gap-4 shadow-sm">
-              <h2 className="font-serif text-2xl text-darkbrown">{editingCertification ? "Edit Certification" : "Add Certification"}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input name="title" required placeholder="Title" defaultValue={editingCertification?.title} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <input name="issuer" required placeholder="Issuer" defaultValue={editingCertification?.issuer} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
-                <input name="date" required placeholder="Date (e.g., 2026-04-24)" defaultValue={editingCertification?.date} className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+            <form onSubmit={handleCertificationSubmit} className={`${classes.card} p-4 sm:p-6 flex flex-col gap-4`}>
+              <h2 className="font-serif text-2xl text-darkbrown mt-2 mb-4">{editingCertification ? "Edit Certification" : "Add Certification"}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input name="title" required placeholder="Title" defaultValue={editingCertification?.title} className={classes.input} />
+                <input name="issuer" required placeholder="Issuer" defaultValue={editingCertification?.issuer} className={classes.input} />
+                <input name="date" required placeholder="Date (e.g., 2026-04-24)" defaultValue={editingCertification?.date} className={classes.input} />
                 <div className="flex flex-col gap-2">
                   <label className="font-mono text-xs uppercase text-darkbrown/60">Certificate Image (Leave blank to keep existing)</label>
-                  <input type="file" name="image" accept="image/*" className="border-b border-darkbrown/20 bg-transparent py-2 focus:outline-none focus:border-rust" />
+                  <input type="file" name="image" accept="image/*" className="border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-rust/10 file:text-rust hover:file:bg-rust/20" />
                   {editingCertification?.imageUrl && (
                     <div className="relative w-32 h-24 mt-2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={editingCertification.imageUrl} alt="Certificate preview" className="w-full h-full object-cover rounded-sm" />
+                      <img src={editingCertification.imageUrl} alt="Certificate preview" className="w-full h-full object-cover rounded-[6px]" />
                       <button type="button" onClick={handleRemoveCertificationImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="flex gap-4 mt-4">
-                <button type="submit" className="bg-rust text-cream font-mono text-xs uppercase tracking-widest px-6 py-3 hover:bg-darkbrown transition-colors">
+              <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                <button type="submit" className={`w-full sm:w-auto ${classes.buttonPrimary}`}>
                   {editingCertification ? "Update Certification" : "Add Certification"}
                 </button>
                 {editingCertification && (
-                  <button type="button" onClick={() => setEditingCertification(null)} className="font-mono text-xs uppercase tracking-widest px-6 py-3 text-darkbrown hover:text-rust transition-colors">
+                  <button type="button" onClick={() => setEditingCertification(null)} className={`w-full sm:w-auto ${classes.buttonSecondary}`}>
                     Cancel
                   </button>
                 )}
@@ -631,19 +674,19 @@ export default function DashboardPage() {
             </form>
 
             <div className="flex flex-col gap-4 mt-8">
-              <h2 className="font-serif text-2xl text-darkbrown">Existing Certifications</h2>
+              <h2 className="font-serif text-2xl text-darkbrown mt-2 mb-4">Existing Certifications</h2>
               {certifications.length === 0 ? <p className="text-darkbrown/60">No certifications found.</p> : [...certifications].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((cert) => (
-                <div key={cert.id} className="p-4 border border-darkbrown/10 bg-white shadow-sm flex justify-between items-center">
-                  <div>
-                    <h3 className="font-sans font-medium text-lg">{cert.title}</h3>
-                    <p className="text-sm text-darkbrown/70">{cert.issuer} — {cert.date}</p>
-                    {cert.imageUrl && <a href={cert.imageUrl.startsWith('http') ? cert.imageUrl : `/images/${cert.imageUrl}`} target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-rust hover:underline mt-1 inline-block">View Image</a>}
+                <div key={cert.id} className={`${classes.card} p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start gap-4`}>
+                  <div className="min-w-0">
+                    <h3 className="font-sans font-medium text-lg truncate">{cert.title}</h3>
+                    <p className="text-sm text-darkbrown/70 mt-1">{cert.issuer} — {cert.date}</p>
+                    {cert.imageUrl && <a href={cert.imageUrl.startsWith('http') ? cert.imageUrl : `/images/${cert.imageUrl}`} target="_blank" rel="noopener noreferrer" className={`mt-2 inline-block ${classes.buttonSecondary}`}>View Image</a>}
                   </div>
-                  <div className="flex gap-4">
-                    <button onClick={() => setEditingCertification(cert)} className="text-xs font-mono uppercase tracking-widest text-darkbrown hover:text-rust transition-colors">Edit</button>
+                  <div className="flex flex-wrap gap-2 items-center shrink-0">
+                    <button onClick={() => setEditingCertification(cert)} className={classes.buttonSecondary}>Edit</button>
                     <button onClick={async () => {
                       if (confirm("Delete this certification?")) await deleteDoc(doc(db, "certifications", cert.id));
-                    }} className="text-xs font-mono uppercase tracking-widest text-rust hover:text-darkbrown transition-colors">Delete</button>
+                    }} className={classes.buttonDelete}>Delete</button>
                   </div>
                 </div>
               ))}

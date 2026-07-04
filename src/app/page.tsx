@@ -152,7 +152,7 @@ export default async function Home() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 max-w-7xl mx-auto w-full">
           {Object.entries(skills).map(([category, items]) => (
-            <div key={category} className="flex flex-col gap-6 group">
+            <div key={category} className="flex flex-col gap-6 group border border-darkbrown/20 bg-cream p-6 sm:p-8 shadow-md hover:shadow-xl hover:border-rust transition-all duration-500">
               <h3 className="font-mono text-sm uppercase tracking-widest text-rust pb-4 border-b border-darkbrown/10 group-hover:border-rust transition-colors duration-500">
                 {category}
               </h3>
