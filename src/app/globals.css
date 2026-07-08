@@ -6,6 +6,14 @@
   body {
     @apply bg-cream text-darkbrown font-sans antialiased overflow-x-hidden;
   }
+  @media (pointer: fine) {
+    body:not(.admin-override) {
+      cursor: none;
+    }
+    body:not(.admin-override) * {
+      cursor: none !important;
+    }
+  }
 }
 
 @layer utilities {

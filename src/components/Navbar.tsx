@@ -35,7 +35,7 @@ export default function Navbar() {
       >
         <Link
           href={link.href}
-          className="font-sans text-[13px] text-rust hover:opacity-60 transition-opacity duration-200 block whitespace-nowrap no-underline"
+          className="cursor-hover font-sans text-[13px] text-rust hover:opacity-60 transition-opacity duration-200 block whitespace-nowrap no-underline"
           style={{ textAlign: scrolled ? "right" : "center" }}
         >
           {link.label}
@@ -55,7 +55,7 @@ export default function Navbar() {
           zIndex: 50,
         }}
       >
-        <Link href="#home" className="flex flex-col gap-0.5 hover:opacity-75 transition-opacity duration-300">
+        <Link href="#home" className="cursor-hover flex flex-col gap-0.5 hover:opacity-75 transition-opacity duration-300">
           <span
             style={{
               fontFamily: "var(--font-inter, sans-serif)",
@@ -137,7 +137,7 @@ export default function Navbar() {
           <motion.li layout="position" style={{ willChange: "transform" }}>
             <Link
               href="/admin/login"
-              className="font-sans text-[11px] text-rust/50 hover:text-rust transition-colors duration-200 block whitespace-nowrap no-underline"
+              className="cursor-hover font-sans text-[11px] text-rust/50 hover:text-rust transition-colors duration-200 block whitespace-nowrap no-underline"
               style={{ textAlign: scrolled ? "right" : "center" }}
             >
               Admin Access
@@ -207,6 +207,7 @@ export default function Navbar() {
                 <Link
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
+                  className="cursor-hover"
                   style={{
                     fontFamily: "var(--font-inter, sans-serif)",
                     fontSize: "24px",
@@ -226,6 +227,7 @@ export default function Navbar() {
               <Link
                 href="/admin/login"
                 onClick={() => setMobileOpen(false)}
+                className="cursor-hover"
                 style={{
                   fontFamily: "var(--font-inter, sans-serif)",
                   fontSize: "16px",

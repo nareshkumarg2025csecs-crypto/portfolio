@@ -23,7 +23,7 @@ export default function CertificationCard({ index, title, issuer, date, imageUrl
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="group relative border border-darkbrown/20 bg-cream p-6 flex flex-col gap-4 shadow-md hover:shadow-xl hover:border-rust transition-all duration-500 cursor-pointer"
+        className="cursor-hover group relative border border-darkbrown/20 bg-cream p-6 flex flex-col gap-4 shadow-md hover:shadow-xl hover:border-rust transition-all duration-500 cursor-pointer"
         onClick={() => imageUrl && setIsModalOpen(true)}
       >
         <div className="flex justify-between items-start relative z-10">
@@ -46,7 +46,7 @@ export default function CertificationCard({ index, title, issuer, date, imageUrl
           <div className="mt-auto pt-4 relative z-20">
             <button 
               onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }} 
-              className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors"
+              className="cursor-hover inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors"
             >
               <ExternalLink size={14} /> View Certificate
             </button>

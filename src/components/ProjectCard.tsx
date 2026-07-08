@@ -21,7 +21,7 @@ export default function ProjectCard({ index, title, description, tags, githubUrl
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="group relative border border-darkbrown/20 bg-cream p-6 sm:p-8 flex flex-col gap-6 shadow-md hover:shadow-xl hover:border-rust transition-all duration-500"
+      className="cursor-hover group relative border border-darkbrown/20 bg-cream p-6 sm:p-8 flex flex-col gap-6 shadow-md hover:shadow-xl hover:border-rust transition-all duration-500"
     >
       <div className="flex justify-between items-start">
         <span className="font-mono text-xs uppercase tracking-widest text-darkbrown/60">
@@ -50,12 +50,12 @@ export default function ProjectCard({ index, title, description, tags, githubUrl
 
       <div className="flex gap-4 pt-4 border-t border-darkbrown/10 mt-auto relative z-10">
         {githubUrl && (
-          <Link href={githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors">
+          <Link href={githubUrl} target="_blank" rel="noopener noreferrer" className="cursor-hover flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors">
             <Code2 size={14} /> Source
           </Link>
         )}
         {liveUrl && (
-          <Link href={liveUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors">
+          <Link href={liveUrl} target="_blank" rel="noopener noreferrer" className="cursor-hover flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors">
             <ExternalLink size={14} /> Visit
           </Link>
         )}
