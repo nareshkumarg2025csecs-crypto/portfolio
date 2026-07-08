@@ -86,6 +86,15 @@ export default async function Home() {
             </Link>
           </div>
         </div>
+        
+        <div className="absolute bottom-12 right-6 md:right-12 z-20 animate-bounce">
+          <span 
+            className="font-sans text-[10px] uppercase tracking-widest text-rust"
+            style={{ writingMode: 'vertical-rl' }}
+          >
+            Scroll to explore
+          </span>
+        </div>
       </section>
 
       {/* Ticker — normal flow, between Hero and About */}
