@@ -1,6 +1,6 @@
 export default function Ticker() {
   const message = "Open to internships and full-stack opportunities — ";
-  const repeatedMessage = message.repeat(10);
+  const repeatedMessage = message.repeat(2);
 
   return (
     <div className="w-full overflow-hidden bg-cream border-y border-darkbrown/10 py-3 relative z-40">
