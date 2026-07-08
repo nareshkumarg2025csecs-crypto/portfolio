@@ -26,7 +26,7 @@ async function getPortfolioData() {
     });
 
     const projectsSnap = await getDocs(query(collection(db, "projects"), orderBy("order", "asc")));
-    const projects = projectsSnap.docs.map(d => d.data());
+    const projects = projectsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     const certsSnap = await getDocs(collection(db, "certifications"));
     const certifications = certsSnap.docs.map(d => d.data())
@@ -180,11 +180,14 @@ export default async function Home() {
           {projects.map((project, idx) => (
             <ProjectCard 
               key={project.title}
+              id={project.id}
               index={idx + 1}
               title={project.title}
               description={project.description}
               tags={project.tags}
               githubUrl={project.githubUrl}
+              liveUrl={project.liveUrl}
+              showcaseImages={project.showcaseImages}
               featured={idx < 2}
             />
           ))}

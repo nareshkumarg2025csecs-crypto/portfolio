@@ -5,12 +5,12 @@ import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 
 const navLinksData = [
-  { href: "#home", label: "Home" },
-  { href: "#about", label: "About" },
-  { href: "#skills", label: "Skills" },
-  { href: "#projects", label: "Projects" },
-  { href: "#certifications", label: "Certifications" },
-  { href: "#contact", label: "Contact" },
+  { href: "/#home", label: "Home" },
+  { href: "/#about", label: "About" },
+  { href: "/#skills", label: "Skills" },
+  { href: "/#projects", label: "Projects" },
+  { href: "/#certifications", label: "Certifications" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export default function Navbar() {
@@ -55,7 +55,7 @@ export default function Navbar() {
           zIndex: 50,
         }}
       >
-        <Link href="#home" className="cursor-hover flex flex-col gap-0.5 hover:opacity-75 transition-opacity duration-300">
+        <Link href="/#home" className="cursor-hover flex flex-col gap-0.5 hover:opacity-75 transition-opacity duration-300">
           <span
             style={{
               fontFamily: "var(--font-inter, sans-serif)",

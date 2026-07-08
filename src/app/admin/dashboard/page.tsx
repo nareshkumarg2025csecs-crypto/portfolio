@@ -54,6 +54,7 @@ interface Project {
   githubUrl: string;
   liveUrl: string;
   imageUrl?: string;
+  showcaseImages?: string[];
   featured: boolean;
   order: number;
 }
@@ -173,6 +174,28 @@ export default function DashboardPage() {
     }
   };
 
+  const handleRemoveShowcaseImage = async (urlToRemove: string) => {
+    if (!editingProject?.showcaseImages) return;
+    if (confirm("Remove this showcase image?")) {
+      const newImages = editingProject.showcaseImages.filter(url => url !== urlToRemove);
+      
+      try {
+        const urlParts = urlToRemove.split('/portfolio-assets/');
+        if (urlParts.length === 2) {
+          // Decode URI component in case the stored URL had encoding
+          const filePath = decodeURIComponent(urlParts[1]);
+          const { error } = await supabase.storage.from('portfolio-assets').remove([filePath]);
+          if (error) console.error("Error deleting file from Supabase:", error);
+        }
+      } catch (error) {
+        console.error("Failed to delete from Supabase:", error);
+      }
+
+      await updateDoc(doc(db, "projects", editingProject.id), { showcaseImages: newImages });
+      setEditingProject({ ...editingProject, showcaseImages: newImages });
+    }
+  };
+
   const handleRemoveCertificationImage = async () => {
     if (!editingCertification?.imageUrl) return;
     if (confirm("Remove certification image?")) {
@@ -262,14 +285,33 @@ export default function DashboardPage() {
     const file = formData.get("image") as File;
     let imageUrl = editingProject?.imageUrl || "";
 
+    const showcaseFiles = formData.getAll("showcaseImages") as File[];
+    let currentShowcaseImages = editingProject?.showcaseImages ? [...editingProject.showcaseImages] : [];
+
     try {
       console.log("Auth current user before project save:", auth.currentUser);
       if (file && file.size > 0) {
-        const filePath = `projects/${Date.now()}_${file.name}`;
+        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        const filePath = `projects/${Date.now()}_${sanitizedFileName}`;
         const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
         if (error) throw error;
         const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
         imageUrl = publicUrl;
+      }
+
+      for (const sf of showcaseFiles) {
+        if (sf && sf.size > 0) {
+          if (!["image/jpeg", "image/png", "image/webp"].includes(sf.type)) {
+            alert(`File ${sf.name} is not a valid image. Only JPG, PNG, WEBP are allowed.`);
+            continue;
+          }
+          const sanitizedFileName = sf.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+          const filePath = `projects/${Date.now()}_showcase_${sanitizedFileName}`;
+          const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, sf);
+          if (error) throw error;
+          const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
+          currentShowcaseImages.push(publicUrl);
+        }
       }
 
       const tagsString = formData.get("tags") as string;
@@ -282,6 +324,7 @@ export default function DashboardPage() {
         githubUrl: formData.get("githubUrl"),
         liveUrl: formData.get("liveUrl"),
         imageUrl,
+        showcaseImages: currentShowcaseImages,
         featured: formData.get("featured") === "on",
         order: Number(formData.get("order") || 0)
       };
@@ -539,6 +582,23 @@ export default function DashboardPage() {
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={editingProject.imageUrl} alt="Project preview" className="w-full h-full object-cover rounded-[6px]" />
                       <button type="button" onClick={handleRemoveProjectImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2 sm:col-span-2">
+                  <label className="font-mono text-xs uppercase text-darkbrown/60">Showcase Images (Upload multiple)</label>
+                  <input type="file" multiple name="showcaseImages" accept="image/jpeg, image/png, image/webp" className="border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-rust/10 file:text-rust hover:file:bg-rust/20" />
+                  
+                  {editingProject?.showcaseImages && editingProject.showcaseImages.length > 0 && (
+                    <div className="flex gap-4 mt-2 overflow-x-auto pb-2 no-scrollbar">
+                      {editingProject.showcaseImages.map((url, i) => (
+                        <div key={i} className="relative w-24 h-16 flex-shrink-0">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt="Showcase preview" className="w-full h-full object-cover rounded-[6px]" />
+                          <button type="button" onClick={() => handleRemoveShowcaseImage(url)} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

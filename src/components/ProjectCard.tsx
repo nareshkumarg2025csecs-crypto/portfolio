@@ -1,20 +1,22 @@
 "use client";
 
-import { ExternalLink, Code2 } from "lucide-react";
+import { ExternalLink, Code2, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 interface ProjectCardProps {
+  id: string;
   index: number;
   title: string;
   description: string;
   tags: string[];
   githubUrl?: string;
   liveUrl?: string;
+  showcaseImages?: string[];
   featured?: boolean;
 }
 
-export default function ProjectCard({ index, title, description, tags, githubUrl, liveUrl, featured }: ProjectCardProps) {
+export default function ProjectCard({ id, index, title, description, tags, githubUrl, liveUrl, showcaseImages, featured }: ProjectCardProps) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 30 }}
@@ -48,7 +50,12 @@ export default function ProjectCard({ index, title, description, tags, githubUrl
         </div>
       </div>
 
-      <div className="flex gap-4 pt-4 border-t border-darkbrown/10 mt-auto relative z-10">
+      <div className="flex flex-wrap gap-4 pt-4 border-t border-darkbrown/10 mt-auto relative z-10">
+        {showcaseImages && showcaseImages.length > 0 && (
+          <Link href={`/projects/${id}/showcase`} className="cursor-hover flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors">
+            <ImageIcon size={14} /> Showcase
+          </Link>
+        )}
         {githubUrl && (
           <Link href={githubUrl} target="_blank" rel="noopener noreferrer" className="cursor-hover flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors">
             <Code2 size={14} /> Source

@@ -45,6 +45,7 @@ export default function CertificationCard({ index, title, issuer, date, imageUrl
         {imageUrl && (
           <div className="mt-auto pt-4 relative z-20">
             <button 
+              suppressHydrationWarning
               onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }} 
               className="cursor-hover inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest hover:text-rust transition-colors"
             >
@@ -65,6 +66,7 @@ export default function CertificationCard({ index, title, issuer, date, imageUrl
           >
             <div className="relative w-full max-w-4xl max-h-full flex flex-col" onClick={e => e.stopPropagation()}>
               <button 
+                suppressHydrationWarning
                 onClick={() => setIsModalOpen(false)}
                 className="absolute -top-12 right-0 text-cream hover:text-rust transition-colors"
               >
