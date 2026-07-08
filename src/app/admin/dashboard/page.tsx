@@ -286,7 +286,7 @@ export default function DashboardPage() {
     let imageUrl = editingProject?.imageUrl || "";
 
     const showcaseFiles = formData.getAll("showcaseImages") as File[];
-    let currentShowcaseImages = editingProject?.showcaseImages ? [...editingProject.showcaseImages] : [];
+    const currentShowcaseImages = editingProject?.showcaseImages ? [...editingProject.showcaseImages] : [];
 
     try {
       console.log("Auth current user before project save:", auth.currentUser);

@@ -15,6 +15,7 @@ interface ShowcasePageProps {
 export default async function ShowcasePage({ params }: ShowcasePageProps) {
   const { projectId } = params;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let projectData: any = null;
   try {
     const docRef = doc(db, "projects", projectId);

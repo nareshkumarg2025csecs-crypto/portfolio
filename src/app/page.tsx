@@ -26,7 +26,8 @@ async function getPortfolioData() {
     });
 
     const projectsSnap = await getDocs(query(collection(db, "projects"), orderBy("order", "asc")));
-    const projects = projectsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const projects: any[] = projectsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     const certsSnap = await getDocs(collection(db, "certifications"));
     const certifications = certsSnap.docs.map(d => d.data())
