@@ -49,7 +49,7 @@ export default async function Home() {
       <div className="fixed inset-0 z-[-1] bg-[#F3EEE1]/85"></div>
       
       {/* Home / Hero Section */}
-      <section id="home" className="relative w-full h-screen flex flex-col justify-between pt-24 pb-12 px-6 sm:px-12 md:px-24 snap-start">
+      <section id="home" className="relative w-full min-h-[calc(100vh-60px)] flex flex-col justify-between pt-24 pb-6 px-6 sm:px-12 md:px-24 snap-start">
         <div className="absolute top-24 left-6 sm:left-12 md:left-24 z-10 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
           <ClockWidget />
         </div>
@@ -75,7 +75,7 @@ export default async function Home() {
             </p>
           </div>
           
-          <div className="mt-16 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'both' }}>
+          <div className="mt-12 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'both' }}>
             <Link href="#projects" className="cursor-hover group flex flex-col items-center gap-4">
               <span className="font-mono text-xs uppercase tracking-widest text-darkbrown/60 group-hover:text-rust transition-colors">
                 View my work
@@ -87,7 +87,7 @@ export default async function Home() {
           </div>
         </div>
         
-        <div className="absolute bottom-12 right-6 md:right-12 z-20 animate-bounce">
+        <div className="absolute bottom-6 right-6 md:right-12 z-20 animate-bounce">
           <span 
             className="font-sans text-[10px] uppercase tracking-widest text-rust"
             style={{ writingMode: 'vertical-rl' }}
