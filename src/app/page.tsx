@@ -86,20 +86,10 @@ export default async function Home() {
             </Link>
           </div>
         </div>
-        
-        <div className="absolute bottom-12 left-0 w-full animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
-          <Ticker />
-        </div>
-
-        <div className="absolute bottom-12 right-6 md:right-12 z-20 animate-bounce">
-          <span 
-            className="font-sans text-[10px] uppercase tracking-widest text-rust"
-            style={{ writingMode: 'vertical-rl' }}
-          >
-            Scroll to explore
-          </span>
-        </div>
       </section>
+
+      {/* Ticker — normal flow, between Hero and About */}
+      <Ticker />
 
       {/* 01 About Section */}
       <section id="about" className="relative w-full min-h-screen py-24 px-6 sm:px-12 md:px-24 snap-start border-t border-dotted border-rust flex flex-col">
