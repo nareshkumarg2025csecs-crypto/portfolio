@@ -10,7 +10,7 @@ import SplitText from "@/components/SplitText";
 import { collection, getDocs, query, orderBy, getDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-export const revalidate = 0; // Disable cache so data is always fresh
+export const revalidate = 0; 
 
 async function getPortfolioData() {
   try {
@@ -26,6 +26,7 @@ async function getPortfolioData() {
     });
 
     const projectsSnap = await getDocs(query(collection(db, "projects"), orderBy("order", "asc")));
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const projects: any[] = projectsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
@@ -44,11 +45,11 @@ export default async function Home() {
   const { profile, skills, projects, certifications } = await getPortfolioData();
   return (
     <main className="relative w-full min-h-screen text-darkbrown selection:bg-rust selection:text-cream">
-      {/* Background Texture with Overlay */}
+      
       <div className="fixed inset-0 z-[-2] bg-[url('/textures/bg-texture.jpg')] bg-repeat" style={{ backgroundSize: '300px' }}></div>
       <div className="fixed inset-0 z-[-1] bg-[#F3EEE1]/85"></div>
       
-      {/* Home / Hero Section */}
+      
       <section id="home" className="relative w-full h-screen flex flex-col justify-between pt-24 pb-12 px-6 sm:px-12 md:px-24 snap-start">
         <div className="absolute top-24 left-6 sm:left-12 md:left-24 z-10 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
           <ClockWidget />
@@ -101,7 +102,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 01 About Section */}
+      
       <section id="about" className="relative w-full min-h-screen py-24 px-6 sm:px-12 md:px-24 snap-start border-t border-dotted border-rust flex flex-col">
         <div className="flex flex-col md:flex-row gap-4 md:gap-12 w-full mb-16">
           <span className="font-mono text-xs uppercase tracking-widest text-rust">01</span>
@@ -144,7 +145,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 02 Skills Section */}
+      
       <section id="skills" className="relative w-full min-h-screen py-24 px-6 sm:px-12 md:px-24 snap-start border-t border-dotted border-rust flex flex-col">
         <div className="flex flex-col md:flex-row gap-4 md:gap-12 w-full mb-24">
           <span className="font-mono text-xs uppercase tracking-widest text-rust">02</span>
@@ -170,7 +171,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 03 Projects Section */}
+      
       <section id="projects" className="relative w-full min-h-screen py-24 px-6 sm:px-12 md:px-24 snap-start border-t border-dotted border-rust flex flex-col">
         <div className="flex flex-col md:flex-row gap-4 md:gap-12 w-full mb-16">
           <span className="font-mono text-xs uppercase tracking-widest text-rust">03</span>
@@ -195,7 +196,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 04 Certifications Section */}
+      
       <section id="certifications" className="relative w-full min-h-screen py-24 px-6 sm:px-12 md:px-24 snap-start border-t border-dotted border-rust flex flex-col">
         <div className="flex flex-col md:flex-row gap-4 md:gap-12 w-full mb-16">
           <span className="font-mono text-xs uppercase tracking-widest text-rust">04</span>
@@ -216,7 +217,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 05 Contact Section */}
+      
       <section id="contact" className="relative w-full min-h-[80vh] py-24 px-6 sm:px-12 md:px-24 snap-start border-t-2 border-dotted border-rust flex flex-col">
         <div className="flex flex-col md:flex-row gap-4 md:gap-12 w-full mb-16">
           <span className="font-mono text-xs uppercase tracking-widest text-rust">05</span>

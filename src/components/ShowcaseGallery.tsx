@@ -28,7 +28,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
     setSelectedIndex((prev) => (prev === images.length - 1 ? 0 : prev! + 1));
   }, [selectedIndex, images.length]);
 
-  // Handle keyboard navigation
+  
   useEffect(() => {
     if (selectedIndex === null) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -40,7 +40,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedIndex, showPrev, showNext]);
 
-  // Lock body scroll when modal is open
+  
   useEffect(() => {
     if (selectedIndex !== null) {
       document.body.style.overflow = "hidden";
@@ -52,7 +52,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
 
   return (
     <>
-      {/* Grid Layout */}
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full mt-8 pb-24">
         {images.map((imgUrl: string, index: number) => (
           <div 
@@ -72,7 +72,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
         ))}
       </div>
 
-      {/* Lightbox Modal */}
+      
       <AnimatePresence>
         {selectedIndex !== null && (
           <motion.div 
@@ -83,7 +83,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
             onClick={closeLightbox}
           >
             <div className="relative w-full h-full max-w-6xl max-h-screen flex items-center justify-center" onClick={e => e.stopPropagation()}>
-              {/* Close Button */}
+              
               <button 
                 onClick={closeLightbox}
                 className="absolute top-4 right-4 md:top-8 md:right-8 text-cream/70 hover:text-rust transition-colors z-[110] p-2 bg-darkbrown/50 rounded-full"
@@ -92,7 +92,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
                 <X size={28} />
               </button>
 
-              {/* Prev Button */}
+              
               {images.length > 1 && (
                 <button 
                   onClick={showPrev}
@@ -103,7 +103,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
                 </button>
               )}
 
-              {/* Main Image */}
+              
               <div className="relative w-full h-[85vh]">
                 <Image 
                   src={images[selectedIndex]} 
@@ -115,7 +115,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
                 />
               </div>
 
-              {/* Next Button */}
+              
               {images.length > 1 && (
                 <button 
                   onClick={showNext}
@@ -126,7 +126,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
                 </button>
               )}
               
-              {/* Counter */}
+              
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-cream/70 font-mono text-sm tracking-widest bg-darkbrown/50 px-4 py-1.5 rounded-full z-[110]">
                 {selectedIndex + 1} / {images.length}
               </div>

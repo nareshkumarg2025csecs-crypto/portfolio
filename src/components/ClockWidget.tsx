@@ -8,7 +8,7 @@ export default function ClockWidget() {
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      // Chennai is IST (UTC+5:30)
+      
       const options: Intl.DateTimeFormatOptions = {
         timeZone: "Asia/Kolkata",
         hour: "2-digit",

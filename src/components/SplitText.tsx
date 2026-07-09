@@ -48,7 +48,7 @@ const SplitText = ({
   const onCompleteRef = useRef(onLetterAnimationComplete);
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
-  // Keep callback ref updated
+  
   useEffect(() => {
     onCompleteRef.current = onLetterAnimationComplete;
   }, [onLetterAnimationComplete]);
@@ -66,7 +66,7 @@ const SplitText = ({
   useGSAP(
     () => {
       if (!ref.current || !text || !fontsLoaded) return;
-      // Prevent re-animation if already completed
+      
       if (animationCompletedRef.current) return;
       const el = ref.current;
 
@@ -74,7 +74,7 @@ const SplitText = ({
         try {
           el._rbsplitInstance.revert();
         } catch {
-          /* noop */
+          
         }
         el._rbsplitInstance = null;
       }

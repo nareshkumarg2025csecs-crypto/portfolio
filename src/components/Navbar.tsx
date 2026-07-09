@@ -17,15 +17,15 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // 1. Use Framer Motion's useScroll to avoid raw event listener lag
+  
   const { scrollY } = useScroll();
   
   useMotionValueEvent(scrollY, "change", (latest) => {
-    // This only triggers a re-render when the boolean value actually flips
+    
     setScrolled(latest > 100);
   });
 
-  // Memoize the links to prevent re-rendering the DOM structure on state changes
+  
   const desktopLinks = useMemo(() => {
     return navLinksData.map((link) => (
       <motion.li 
@@ -46,7 +46,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ── Top-left: Wordmark ── */}
+      
       <div
         style={{
           position: "absolute",
@@ -83,7 +83,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Decorative ring + dot */}
+        
         <div
           style={{
             marginTop: "14px",
@@ -107,7 +107,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── Top-right (desktop): Nav links with scroll layout transition ── */}
+      
       <motion.div
         className="hidden md:block"
         layout
@@ -122,7 +122,7 @@ export default function Navbar() {
           top: scrolled ? "50%" : "24px",
           y: scrolled ? "-50%" : "0%",
         }}
-        // 2. Reduce duration to 80ms and use a single transition object
+        
         transition={{ duration: 0.08, ease: "easeOut" }}
       >
         <motion.ul
@@ -146,7 +146,7 @@ export default function Navbar() {
         </motion.ul>
       </motion.div>
 
-      {/* ── Mobile: hamburger toggle ── */}
+      
       <button
         className="md:hidden"
         onClick={() => setMobileOpen(!mobileOpen)}
@@ -177,7 +177,7 @@ export default function Navbar() {
         )}
       </button>
 
-      {/* ── Mobile fullscreen overlay ── */}
+      
       <AnimatePresence>
         {mobileOpen && (
           <motion.div

@@ -15,6 +15,7 @@ interface ShowcasePageProps {
 export default async function ShowcasePage({ params }: ShowcasePageProps) {
   const { projectId } = params;
 
+  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let projectData: any = null;
   try {
@@ -33,7 +34,7 @@ export default async function ShowcasePage({ params }: ShowcasePageProps) {
 
   return (
     <main className="min-h-screen bg-[#F3EEE1] text-darkbrown py-24 px-6 sm:px-12 md:px-24 selection:bg-rust selection:text-cream">
-      {/* Background Texture with Overlay */}
+      
       <div className="fixed inset-0 z-[-2] bg-[url('/textures/bg-texture.jpg')] bg-repeat" style={{ backgroundSize: '300px' }}></div>
       <div className="fixed inset-0 z-[-1] bg-[#F3EEE1]/85"></div>
 

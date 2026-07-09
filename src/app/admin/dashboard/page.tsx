@@ -95,33 +95,33 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
     
-    // Subscribe to messages
+    
     const qMsgs = query(collection(db, "messages"), orderBy("createdAt", "desc"));
     const unsubMsgs = onSnapshot(qMsgs, (snapshot) => {
       const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
       setMessages(msgs);
     });
 
-    // Subscribe to certifications
+    
     const unsubCerts = onSnapshot(collection(db, "certifications"), (snapshot) => {
       const certs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Certification));
       setCertifications(certs);
     });
 
-    // Subscribe to profile
+    
     const unsubProfile = onSnapshot(doc(db, "profile", "main"), (docSnap) => {
       if (docSnap.exists()) {
         setProfile(docSnap.data() as Profile);
       }
     });
 
-    // Subscribe to skills
+    
     const unsubSkills = onSnapshot(collection(db, "skills"), (snapshot) => {
       const s = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Skill));
       setSkills(s);
     });
 
-    // Subscribe to projects
+    
     const qProjects = query(collection(db, "projects"), orderBy("order", "asc"));
     const unsubProjects = onSnapshot(qProjects, (snapshot) => {
       const p = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
@@ -182,7 +182,7 @@ export default function DashboardPage() {
       try {
         const urlParts = urlToRemove.split('/portfolio-assets/');
         if (urlParts.length === 2) {
-          // Decode URI component in case the stored URL had encoding
+          
           const filePath = decodeURIComponent(urlParts[1]);
           const { error } = await supabase.storage.from('portfolio-assets').remove([filePath]);
           if (error) console.error("Error deleting file from Supabase:", error);
@@ -383,7 +383,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
-      {/* Mobile hamburger button */}
+      
       <button
         className="md:hidden fixed top-4 left-4 z-50 bg-darkbrown/10 hover:bg-darkbrown/20 text-darkbrown p-2 rounded-lg transition-colors"
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -400,7 +400,7 @@ export default function DashboardPage() {
         )}
       </button>
 
-      {/* Mobile backdrop */}
+      
       {sidebarOpen && (
         <div
           className="md:hidden fixed inset-0 z-30 bg-darkbrown/30 backdrop-blur-sm"
@@ -408,7 +408,7 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Sidebar */}
+      
       <aside className={`
         fixed md:static inset-y-0 left-0 z-40
         w-64 bg-[#EAE4D3] border-r border-darkbrown/10 flex flex-col
@@ -484,7 +484,7 @@ export default function DashboardPage() {
                   {profile?.photoUrl && (
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-12 h-12 rounded-full overflow-hidden relative group">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        
                         <img src={profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
                         <button type="button" onClick={handleRemoveProfilePhoto} className="absolute top-0 right-0 bg-darkbrown/80 text-cream w-4 h-4 rounded-full flex items-center justify-center text-[10px] hover:bg-rust transition-colors leading-none pb-[1px]" aria-label="Remove photo">&times;</button>
                       </div>
@@ -579,7 +579,7 @@ export default function DashboardPage() {
                   <input type="file" name="image" accept="image/*" className="border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-rust/10 file:text-rust hover:file:bg-rust/20" />
                   {editingProject?.imageUrl && (
                     <div className="relative w-32 h-24 mt-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      
                       <img src={editingProject.imageUrl} alt="Project preview" className="w-full h-full object-cover rounded-[6px]" />
                       <button type="button" onClick={handleRemoveProjectImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
                     </div>
@@ -594,7 +594,7 @@ export default function DashboardPage() {
                     <div className="flex gap-4 mt-2 overflow-x-auto pb-2 no-scrollbar">
                       {editingProject.showcaseImages.map((url, i) => (
                         <div key={i} className="relative w-24 h-16 flex-shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          
                           <img src={url} alt="Showcase preview" className="w-full h-full object-cover rounded-[6px]" />
                           <button type="button" onClick={() => handleRemoveShowcaseImage(url)} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
                         </div>
@@ -634,7 +634,7 @@ export default function DashboardPage() {
                     <div key={proj.id} className={`${classes.card} p-4 sm:p-5 flex flex-col sm:flex-row gap-4 items-start`}>
                       {proj.imageUrl && (
                         <div className="w-full sm:w-28 h-24 bg-darkbrown/5 flex-shrink-0 relative overflow-hidden rounded-[8px]">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          
                           <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover" />
                         </div>
                       )}
@@ -714,7 +714,7 @@ export default function DashboardPage() {
                   <input type="file" name="image" accept="image/*" className="border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-rust/10 file:text-rust hover:file:bg-rust/20" />
                   {editingCertification?.imageUrl && (
                     <div className="relative w-32 h-24 mt-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      
                       <img src={editingCertification.imageUrl} alt="Certificate preview" className="w-full h-full object-cover rounded-[6px]" />
                       <button type="button" onClick={handleRemoveCertificationImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
                     </div>
