@@ -4,7 +4,7 @@ import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { auth, db } from "@/lib/firebase";
-import { supabase } from "@/lib/supabase";
+import { supabase, getSupabaseUrl } from "@/lib/supabase";
 import { signOut } from "firebase/auth";
 import { collection, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, addDoc, setDoc, Timestamp } from "firebase/firestore";
 import Link from "next/link";
@@ -219,16 +219,14 @@ export default function DashboardPage() {
         const filePath = `profile/${Date.now()}_${photoFile.name}`;
         const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, photoFile);
         if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
-        photoUrl = publicUrl;
+        photoUrl = filePath;
       }
 
       if (resumeFile && resumeFile.size > 0) {
         const filePath = `resume/${Date.now()}_${resumeFile.name}`;
         const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, resumeFile);
         if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
-        resumeUrl = publicUrl;
+        resumeUrl = filePath;
       }
 
       const updatedProfile = {
@@ -295,8 +293,7 @@ export default function DashboardPage() {
         const filePath = `projects/${Date.now()}_${sanitizedFileName}`;
         const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
         if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
-        imageUrl = publicUrl;
+        imageUrl = filePath;
       }
 
       for (const sf of showcaseFiles) {
@@ -309,8 +306,7 @@ export default function DashboardPage() {
           const filePath = `projects/${Date.now()}_showcase_${sanitizedFileName}`;
           const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, sf);
           if (error) throw error;
-          const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
-          currentShowcaseImages.push(publicUrl);
+          currentShowcaseImages.push(filePath);
         }
       }
 
@@ -354,8 +350,7 @@ export default function DashboardPage() {
         const filePath = `certifications/${Date.now()}_${file.name}`;
         const { error } = await supabase.storage.from('portfolio-assets').upload(filePath, file);
         if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('portfolio-assets').getPublicUrl(filePath);
-        imageUrl = publicUrl;
+        imageUrl = filePath;
       }
 
       const certData = {
@@ -485,7 +480,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-12 h-12 rounded-full overflow-hidden relative group">
                         
-                        <img src={profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                        <img src={getSupabaseUrl(profile.photoUrl)} alt="Profile" className="w-full h-full object-cover" />
                         <button type="button" onClick={handleRemoveProfilePhoto} className="absolute top-0 right-0 bg-darkbrown/80 text-cream w-4 h-4 rounded-full flex items-center justify-center text-[10px] hover:bg-rust transition-colors leading-none pb-[1px]" aria-label="Remove photo">&times;</button>
                       </div>
                       <p className="text-xs text-darkbrown/50 line-clamp-1">{profile.photoUrl.split('/').pop()?.split('?')[0]}</p>
@@ -497,7 +492,7 @@ export default function DashboardPage() {
                   <input type="file" name="resume" accept="application/pdf" className="border border-[rgba(58,46,38,0.15)] rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:border-rust focus:shadow-[0_0_0_3px_rgba(181,80,45,0.1)] transition-all duration-150 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-rust/10 file:text-rust hover:file:bg-rust/20" />
                   {profile?.resumeUrl && (
                     <div className="flex items-center gap-4 mt-1">
-                      <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className={classes.buttonSecondary}>View Current Resume</a>
+                      <a href={getSupabaseUrl(profile.resumeUrl)} target="_blank" rel="noopener noreferrer" className={classes.buttonSecondary}>View Current Resume</a>
                       <button type="button" onClick={handleRemoveResume} className={`${classes.buttonSecondary} flex items-center gap-1`}>
                         <span className="text-[14px] leading-none pb-[1px]">&times;</span> Remove
                       </button>
@@ -580,7 +575,7 @@ export default function DashboardPage() {
                   {editingProject?.imageUrl && (
                     <div className="relative w-32 h-24 mt-2">
                       
-                      <img src={editingProject.imageUrl} alt="Project preview" className="w-full h-full object-cover rounded-[6px]" />
+                      <img src={getSupabaseUrl(editingProject.imageUrl)} alt="Project preview" className="w-full h-full object-cover rounded-[6px]" />
                       <button type="button" onClick={handleRemoveProjectImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
                     </div>
                   )}
@@ -595,7 +590,7 @@ export default function DashboardPage() {
                       {editingProject.showcaseImages.map((url, i) => (
                         <div key={i} className="relative w-24 h-16 flex-shrink-0">
                           
-                          <img src={url} alt="Showcase preview" className="w-full h-full object-cover rounded-[6px]" />
+                          <img src={getSupabaseUrl(url)} alt="Showcase preview" className="w-full h-full object-cover rounded-[6px]" />
                           <button type="button" onClick={() => handleRemoveShowcaseImage(url)} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
                         </div>
                       ))}
@@ -635,7 +630,7 @@ export default function DashboardPage() {
                       {proj.imageUrl && (
                         <div className="w-full sm:w-28 h-24 bg-darkbrown/5 flex-shrink-0 relative overflow-hidden rounded-[8px]">
                           
-                          <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover" />
+                          <img src={getSupabaseUrl(proj.imageUrl)} alt={proj.title} className="w-full h-full object-cover" />
                         </div>
                       )}
                       <div className="flex-grow w-full min-w-0">
@@ -715,7 +710,7 @@ export default function DashboardPage() {
                   {editingCertification?.imageUrl && (
                     <div className="relative w-32 h-24 mt-2">
                       
-                      <img src={editingCertification.imageUrl} alt="Certificate preview" className="w-full h-full object-cover rounded-[6px]" />
+                      <img src={getSupabaseUrl(editingCertification.imageUrl)} alt="Certificate preview" className="w-full h-full object-cover rounded-[6px]" />
                       <button type="button" onClick={handleRemoveCertificationImage} className="absolute -top-2 -right-2 bg-darkbrown text-cream w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-rust transition-colors shadow-sm leading-none pb-[1px] z-10" aria-label="Remove image">&times;</button>
                     </div>
                   )}
@@ -740,7 +735,7 @@ export default function DashboardPage() {
                   <div className="min-w-0">
                     <h3 className="font-sans font-medium text-lg truncate">{cert.title}</h3>
                     <p className="text-sm text-darkbrown/70 mt-1">{cert.issuer} — {cert.date}</p>
-                    {cert.imageUrl && <a href={cert.imageUrl.startsWith('http') ? cert.imageUrl : `/images/${cert.imageUrl}`} target="_blank" rel="noopener noreferrer" className={`mt-2 inline-block ${classes.buttonSecondary}`}>View Image</a>}
+                    {cert.imageUrl && <a href={getSupabaseUrl(cert.imageUrl)} target="_blank" rel="noopener noreferrer" className={`mt-2 inline-block ${classes.buttonSecondary}`}>View Image</a>}
                   </div>
                   <div className="flex flex-wrap gap-2 items-center shrink-0">
                     <button onClick={() => setEditingCertification(cert)} className={classes.buttonSecondary}>Edit</button>

@@ -12,7 +12,7 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'rsrldfurryoaeadfevkd.supabase.co',
         port: '',
-        pathname: '/storage/v1/object/public/portfolio-assets/**',
+        pathname: '/storage/v1/object/**',
       },
     ],
   },

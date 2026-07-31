@@ -9,6 +9,7 @@ import SplitText from "@/components/SplitText";
 
 import { collection, getDocs, query, orderBy, getDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { getSupabaseUrl } from "@/lib/supabase";
 
 export const revalidate = 0; 
 
@@ -113,7 +114,7 @@ export default async function Home() {
           <div className="md:col-span-5 md:col-start-2">
             <div className="cursor-hover aspect-[3/4] relative w-full overflow-hidden bg-darkbrown/5 filter grayscale hover:grayscale-0 transition-all duration-700">
               <Image 
-                src={profile?.photoUrl || "/images/profile.png"} 
+                src={getSupabaseUrl(profile?.photoUrl) || "/images/profile.png"} 
                 alt={profile?.name || "Profile"} 
                 fill 
                 className="object-cover"

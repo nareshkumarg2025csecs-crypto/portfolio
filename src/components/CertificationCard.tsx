@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ExternalLink, X } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { getSupabaseUrl } from "@/lib/supabase";
 
 interface CertificationCardProps {
   index: number;
@@ -15,6 +16,7 @@ interface CertificationCardProps {
 
 export default function CertificationCard({ index, title, issuer, date, imageUrl }: CertificationCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const resolvedImageUrl = getSupabaseUrl(imageUrl);
 
   return (
     <>
@@ -56,7 +58,7 @@ export default function CertificationCard({ index, title, issuer, date, imageUrl
       </motion.div>
 
       <AnimatePresence>
-        {isModalOpen && imageUrl && (
+        {isModalOpen && resolvedImageUrl && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -74,7 +76,7 @@ export default function CertificationCard({ index, title, issuer, date, imageUrl
               </button>
               <div className="relative w-full h-[80vh]">
                 <Image 
-                  src={imageUrl.startsWith('http') ? imageUrl : `/images/${imageUrl}`}
+                  src={resolvedImageUrl}
                   alt={title} 
                   fill
                   className="object-contain"

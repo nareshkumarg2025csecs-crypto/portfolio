@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { getSupabaseUrl } from "@/lib/supabase";
 
 interface ShowcaseGalleryProps {
   images: string[];
@@ -61,7 +62,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
             className="group cursor-pointer relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-md hover:shadow-xl border border-darkbrown/10 bg-darkbrown/5 transition-all duration-300 hover:-translate-y-1"
           >
             <Image 
-              src={imgUrl} 
+              src={getSupabaseUrl(imgUrl)} 
               alt={`${projectTitle} screenshot ${index + 1}`}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -106,7 +107,7 @@ export default function ShowcaseGallery({ images, projectTitle }: ShowcaseGaller
               
               <div className="relative w-full h-[85vh]">
                 <Image 
-                  src={images[selectedIndex]} 
+                  src={getSupabaseUrl(images[selectedIndex])} 
                   alt={`${projectTitle} screenshot ${selectedIndex + 1}`}
                   fill
                   className="object-contain"
